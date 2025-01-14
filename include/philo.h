@@ -1,50 +1,74 @@
 #ifndef PHILO_H
 # define PHILO_H
 
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdbool.h> 
-#include <string.h> //ft_strcmp実装する
+# include <pthread.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <sys/time.h>
+# include <stdbool.h>
+# include <string.h>
 
-// 哲学者の状態を表す列挙型
-typedef enum e_state {
-    THINKING,   // 考え中
-    EATING,     // 食事中
-    SLEEPING,   // 睡眠中
-    DIED        // 死亡
-} t_state;
+# define MAX_PHILOSOPHERS 200
+# define SUCCESS 0
+# define ERROR 1
 
-//共有データ持つ構造体
-typedef struct s_data{
-    int num_philosophers; // 哲学者の人数
-    int time_to_die; // もし哲学者が最後の食事からtime_to_die秒以内に食事をしなかった場合、死亡する
-    int time_to_eat; // 食事にかかる時間（ミリ秒）、2本のフォークを持つ必要がある
-    int time_to_sleep; //　睡眠時間（ミリ秒）
-    long start_time; // プログラム開始時刻
-    pthread_mutex_t *forks; // フォーク（ミューテックスの配列）
-}t_data;
+// メッセージ定義
+# define FORK_TAKEN "has taken a fork"
+# define EATING "is eating"
+# define SLEEPING "is sleeping"
+# define THINKING "is thinking"
+# define DIED "died"
 
-//各哲学者の情報を持つ構造体
-typedef struct s_philosopher{
-    int id; // 哲学者の番号（0からスタート）
-    t_state state; // 現在の状態
-    long last_meal_time; // 最後に食事した時間、哲学者が飢え死にするかどうかをチェックするために使用
-    pthread_t thread; // スレッドを識別するための型、各哲学者は別々のスレッドで動作するため、それぞれにpthread_tが必要
-    struct s_data *data;  // 共有データへのポインタ
+// 前方宣言
+typedef struct s_data t_data;
+
+typedef struct s_philosopher {
+    pthread_t   thread;
+    int         id;
+    int         eating;
+    int         eat_count;
+    bool        is_satisfied;
+    long        last_meal_time;
+    t_data      *data;
 } t_philosopher;
 
+typedef struct s_data {
+    int num_philosophers;
+    int time_to_die;
+    int time_to_eat;
+    int time_to_sleep;
+    int must_eat_count;
+    bool someone_died;
+    bool all_satisfied;
+    long start_time;
+    pthread_mutex_t forks[MAX_PHILOSOPHERS];
+    pthread_mutex_t print_mutex;
+    pthread_mutex_t death_mutex;
+    pthread_mutex_t meal_mutex;
+    pthread_mutex_t state_mutex;
+    pthread_t monitor;
+    t_philosopher *philosophers;
+} t_data;
 
-void init_forks(t_data *data);
+
 long get_current_time();
-void *philosopher_rotine(void *argv);
+void *philosopher_routine(void *argv);
 void print_status(t_philosopher *philo, char *status);
 void thinking(t_philosopher *philo);
 int take_forks(t_philosopher *philo);
 void eating(t_philosopher *philo);
 void put_down_forks(t_philosopher *philo);
 void sleeping(t_philosopher *philo);
+int init_data(t_data *data, int argc, char **argv);
+void error_exit(char *message);
+int initialize_philosophers(t_data *data, t_philosopher *philosophers);
+void cleanup_resources(t_data *data);
+int check_death(t_philosopher *philo);
+void *monitor_routine(void *arg);
+int check_all_ate_must_eat_count(t_philosopher *philosophers);
+void precise_sleep(long milliseconds);
+
+
 
 #endif

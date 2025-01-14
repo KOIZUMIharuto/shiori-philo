@@ -4,7 +4,7 @@ NAME = philo
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 INCLUDES = -I./include
-SRCS = main.c mutex.c philosophers.c philosopher_rotine.c utils.c 
+SRCS =  check_status.c error.c  init.c  main.c  monitor.c philosopher_routine.c philosophers.c time.c
 OBJS = $(SRCS:.c=.o)
 RM = rm -f 
 

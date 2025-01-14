@@ -1,38 +1,59 @@
+// philosophers.c
 #include "philo.h"
 
-// 状態を表示する関数
+// 状態出力用の関数（排他制御付き）
 void print_status(t_philosopher *philo, char *status)
 {
-    // 現在時刻を取得
-    long current_time = get_current_time() - philo->data->start_time;
-
-    // 状態を更新（これが抜けていました）
-    if (strcmp(status, "is thinking") == 0)
-        philo->state = THINKING;
-    else if (strcmp(status, "is eating") == 0)
-        philo->state = EATING;
-    else if (strcmp(status, "is sleeping") == 0)
-        philo->state = SLEEPING;
-
-    // ステータスを表示
-    printf("%ld %d %s\n", current_time, philo->id + 1, status);
+    pthread_mutex_lock(&philo->data->print_mutex);
+    if (!philo->data->someone_died)
+    {
+        long current_time = get_current_time() - philo->data->start_time;
+        printf("%ld %d %s\n", current_time, philo->id + 1, status);
+    }
+    pthread_mutex_unlock(&philo->data->print_mutex);
 }
 
-// 哲学者の行動ルーチン（スレッドとして実行される
-void *philosopher_rotine(void *argv)
-{
-    // 哲学者のデータを受け取る（argを哲学者構造体に変換する）
-    t_philosopher *philo = (t_philosopher *)argv;
 
-    // 無限ループで哲学者の行動を繰り返す
+void *philosopher_routine(void *argv)
+{
+    t_philosopher *philo = (t_philosopher *)argv;
+    t_data *data = philo->data;
+
     while (1)
     {
-        thinking(philo);        // 考える
-        take_forks(philo);      // フォークを取る
-        eating(philo);          // 食べる
-        put_down_forks(philo);   // フォークを置く
-        sleeping(philo);        // 寝る
-    }
-    return (NULL);
+        pthread_mutex_lock(&data->death_mutex);
+        if (data->someone_died || data->all_satisfied)
+        {
+            pthread_mutex_unlock(&data->death_mutex);
+            return (NULL);
+        }
+        pthread_mutex_unlock(&data->death_mutex);
 
+        // 指定回数食事済みの場合は終了
+        if (philo->eat_count >= data->must_eat_count && data->must_eat_count > 0)
+            return (NULL);
+
+        // 死亡チェック
+        if (check_death(philo))
+            return (NULL);
+
+        thinking(philo);
+
+        if (take_forks(philo))
+            return (NULL);
+
+        if (check_death(philo))
+        {
+            put_down_forks(philo);
+            return (NULL);
+        }
+
+        eating(philo);
+        put_down_forks(philo);
+
+        if (check_death(philo))
+            return (NULL);
+
+        sleeping(philo);
+    }
 }

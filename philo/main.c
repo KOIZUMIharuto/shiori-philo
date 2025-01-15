@@ -1,4 +1,22 @@
 // main.c
+
+// number_of_philosophers time_to_die time_to_eat time_to_sleep
+// [number_of_times_each_philosopher_must_eat]
+// last meal or the beginning of the simulation, they die.
+// number_of_times_each_philosopher_must_eat
+// ◦ timestamp_in_ms X has taken a fork
+// ◦ timestamp_in_ms X is eating
+// ◦ timestamp_in_ms X is sleeping
+// ◦ timestamp_in_ms X is thinking
+
+
+// memset, printf, malloc, free, write,
+// usleep, gettimeofday, pthread_create,
+// pthread_detach, pthread_join, pthread_mutex_init,
+// pthread_mutex_destroy, pthread_mutex_lock,
+// pthread_mutex_unlock
+
+// ◦ timestamp_in_ms X died
 #include "philo.h"
 
 int main(int argc, char **argv)

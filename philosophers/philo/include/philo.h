@@ -1,73 +1,79 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: shiori <shiori@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/16 18:21:20 by shiori            #+#    #+#             */
+/*   Updated: 2025/02/17 04:49:03 by shiori           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_H
 # define PHILO_H
 
 # include <pthread.h>
+# include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
-# include <unistd.h>
 # include <sys/time.h>
-# include <stdbool.h>
-# include <string.h>
+# include <unistd.h>
 
-# define MAX_PHILOSOPHERS 200
-# define SUCCESS 0
-# define ERROR 1
-
-// メッセージ定義
 # define FORK_TAKEN "has taken a fork"
 # define EATING "is eating"
 # define SLEEPING "is sleeping"
 # define THINKING "is thinking"
 # define DIED "died"
 
-typedef struct s_philosopher t_philosopher;
 
-typedef struct s_data {
-    int num_philosophers;
-    long time_to_die;
-    long time_to_eat;
-    long time_to_sleep;
-    long start_time;
-    int must_eat_count;
-    bool someone_died;
-    bool all_satisfied;
-    pthread_mutex_t state_mutex;
-    pthread_mutex_t *forks;
-    pthread_mutex_t print_mutex;
-    pthread_t monitor;
-    t_philosopher *philosophers;
-} t_data;
-
-typedef struct s_philosopher
+typedef struct s_philo
 {
+    pthread_t		thread;
     int             id;
+    bool             eating;
     int             eat_count;
     long            last_meal_time;
-    pthread_t       thread;
-    t_data          *data;
-    pthread_mutex_t meal_time_mutex;  // 追加
-    pthread_mutex_t eat_count_mutex;  // 追加
-} t_philosopher;
+    long            start_time;
+    bool            *someone_died;
+    bool            *all_satisfied;
+    int				num_of_philos;
+    long			time_to_die;
+    long			time_to_eat;
+    long			time_to_sleep;
+    int             must_eat_count;
+    pthread_mutex_t *right_fork;
+    pthread_mutex_t *left_fork;
+    pthread_mutex_t *print_mutex;
+    pthread_mutex_t *state_mutex;
+} t_philo;
 
+typedef struct s_program {
+    int				num_of_philos;
+    bool someone_died;
+    bool all_satisfied;
+    pthread_mutex_t *forks;
+    pthread_mutex_t print_mutex;
+    pthread_mutex_t state_mutex;
+    t_philo *philos;
+} t_program;
 
-
-
-
-
-long get_current_time();
-void *philosopher_routine(void *argv);
-void print_status(t_philosopher *philo, char *status);
-void thinking(t_philosopher *philo);
-int take_forks(t_philosopher *philo);
-void eating(t_philosopher *philo);
-void put_down_forks(t_philosopher *philo);
-void sleeping(t_philosopher *philo);
-int init_data(t_data *data, int argc, char **argv);
-void error_exit(char *message);
-void cleanup_resources(t_data *data);
-int check_death(t_philosopher *philo);
-void *monitor_routine(void *arg);
-int check_ate_count(t_philosopher *philosophers);
+int should_stop_simulation(t_philo *philo);
+void   init_program(t_program *program);
+void	init_philos(t_philo *philos, t_program *program, char **argv);
+void	thread_create(t_program *program);
+void    *philo_routine(void *arg);
+void    *monitor_routine(void *arg);
+void    take_forks(t_philo *philo);
+void    eating(t_philo *philo);
+void    sleeping(t_philo *philo);
+void    thinking(t_philo *philo);
+void    put_down_forks(t_philo *philo);
+long    get_current_time(void);
+void    print_status(t_philo *philo, const char *status);
+int     ft_atoi(const char *str);
+void    ft_usleep(long milliseconds);
+void cleanup_resources(char *str, t_program *program);
 
 
 

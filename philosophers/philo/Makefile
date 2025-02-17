@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: shiori <shiori@student.42.fr>              +#+  +:+       +#+         #
+#    By: hkoizumi <hkoizumi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/16 19:37:40 by shiori            #+#    #+#              #
-#    Updated: 2025/02/17 04:36:30 by shiori           ###   ########.fr        #
+#    Updated: 2025/02/17 10:52:38 by hkoizumi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 NAME = philo
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=address
 INCLUDES = -I./include
 SRCS =  init.c main.c monitor.c philo_routine.c thread.c utils.c
 OBJS = $(SRCS:.c=.o)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shiori <shiori@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hkoizumi <hkoizumi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 18:21:20 by shiori            #+#    #+#             */
-/*   Updated: 2025/02/17 04:49:03 by shiori           ###   ########.fr       */
+/*   Updated: 2025/02/17 10:41:44 by hkoizumi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ typedef struct s_philo
 {
     pthread_t		thread;
     int             id;
-    bool             eating;
+    // bool             eating;
     int             eat_count;
     long            last_meal_time;
     long            start_time;

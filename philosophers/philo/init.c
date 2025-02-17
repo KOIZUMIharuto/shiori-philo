@@ -33,7 +33,7 @@ void	init_philos(t_philo *philos, t_program *program, char **argv)
     while (i < program->num_of_philos)
 	{
         philos[i].id = i + 1;
-		philos[i].eating = false;
+		// philos[i].eating = false;
 		philos[i].eat_count = 0;
         init_input(&philos[i], argv);
         philos[i].last_meal_time = get_current_time();

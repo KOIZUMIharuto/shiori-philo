@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   thread.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shiori <shiori@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hkoizumi <hkoizumi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 18:31:05 by shiori            #+#    #+#             */
-/*   Updated: 2025/02/17 05:06:25 by shiori           ###   ########.fr       */
+/*   Updated: 2025/02/17 11:09:18 by hkoizumi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,12 @@ int should_stop_simulation(t_philo *philo)
 {
     pthread_mutex_lock(philo->state_mutex);
     if (*philo->someone_died || *philo->all_satisfied)
-        return (pthread_mutex_unlock(philo->state_mutex), 1);
-    pthread_mutex_unlock(philo->state_mutex);
-    return (0);
+	{
+		pthread_mutex_unlock(philo->state_mutex);
+		return (1);
+	}
+	pthread_mutex_unlock(philo->state_mutex);
+	return (0);
 }
 
 void print_status(t_philo *philo,const char *status)
@@ -58,8 +61,8 @@ void *philo_routine(void *argv)
     t_philo *philo;
     
     philo= (t_philo *)argv;
-    if (philo->id % 2 == 0)
-        ft_usleep(1);
+    // if (philo->id % 2 == 0)
+    //     ft_usleep(1);
     while (!should_stop_simulation(philo))
     {
         take_forks(philo);

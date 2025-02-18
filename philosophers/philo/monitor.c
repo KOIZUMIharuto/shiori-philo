@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shiori <shiori@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hkoizumi <hkoizumi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:06:14 by shiori            #+#    #+#             */
-/*   Updated: 2025/02/17 05:14:20 by shiori           ###   ########.fr       */
+/*   Updated: 2025/02/17 11:10:57 by hkoizumi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,16 @@ int	check_philosopher_death(t_philo *philo)
     current_time = get_current_time();
     since_last_meal_time = current_time - philo->last_meal_time;
     is_dead = false;
-    if((since_last_meal_time >= philo->time_to_die) && (!philo->eating))
-    {
-        *philo->someone_died = true;
+    // if((since_last_meal_time >= philo->time_to_die) && (!philo->eating))
+    if((since_last_meal_time >= philo->time_to_die))
         is_dead = true;
-    }
 	pthread_mutex_unlock(philo->state_mutex);
     if (is_dead)
     {
         print_status(philo, DIED);
+		pthread_mutex_lock(philo->state_mutex);
+        *philo->someone_died = true;
+		pthread_mutex_unlock(philo->state_mutex);
         return (1);
     }
 	return (0);
@@ -78,7 +79,9 @@ void *monitor_routine(void *argv)
         while (i < philos[0].num_of_philos)
         {
             if (check_philosopher_death(&philos[i]))
+			{
                 return (NULL);
+			}
             i++;
         }
         if (check_all_philosophers_satisfied(philos))

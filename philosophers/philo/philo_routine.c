@@ -25,30 +25,47 @@ void sleeping(t_philo *philo)
 
 void take_forks(t_philo *philo)
 {
-    pthread_mutex_lock(philo->right_fork);
-    print_status(philo, FORK_TAKEN);
     if (philo->num_of_philos == 1)
     {
+		print_status(philo, FORK_TAKEN);
         ft_usleep(philo->time_to_die);
-        pthread_mutex_unlock(philo->right_fork);
         return ;
     }
-    pthread_mutex_lock(philo->left_fork);
-    print_status(philo, FORK_TAKEN);
+	if (philo->id % 2 == 1)
+	{
+		pthread_mutex_lock(philo->right_fork);
+		print_status(philo, FORK_TAKEN);
+		if (philo->eat_count == 0)
+			usleep(200);
+		pthread_mutex_lock(philo->left_fork);
+		print_status(philo, FORK_TAKEN);
+	}
+	else
+	{
+		if (philo->eat_count == 0)
+			usleep(100);
+		pthread_mutex_lock(philo->left_fork);
+		print_status(philo, FORK_TAKEN);
+		pthread_mutex_lock(philo->right_fork);
+		print_status(philo, FORK_TAKEN);
+	}
 }
 
 void eating(t_philo *philo)
 {
-    pthread_mutex_lock(philo->state_mutex);
-    philo->eating = true;
-    philo->last_meal_time = get_current_time();
-    philo->eat_count++;
-    pthread_mutex_unlock(philo->state_mutex);
     print_status(philo, EATING);
+    pthread_mutex_lock(philo->state_mutex);
+    // philo->eating = true;
+    philo->last_meal_time = get_current_time();
+    // philo->eat_count++;
+    pthread_mutex_unlock(philo->state_mutex);
     ft_usleep(philo->time_to_eat);
     pthread_mutex_lock(philo->state_mutex);
-    philo->eating = false;
+    philo->eat_count++;
     pthread_mutex_unlock(philo->state_mutex);
+    // pthread_mutex_lock(philo->state_mutex);
+    // philo->eating = false;
+    // pthread_mutex_unlock(philo->state_mutex);
 }
 
 void put_down_forks(t_philo *philo)
